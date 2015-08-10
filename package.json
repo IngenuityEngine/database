@@ -1,0 +1,19 @@
+{
+  "name": "database",
+  "version": "0.0.1",
+  "main": "./database/index.js",
+  "scripts": {
+    "prepublish": "npm prune",
+    "test": "mocha test/*"
+  },
+  "description": "database",
+  "dependencies": {
+    "arkutil": "0.0.4",
+    "async": "*",
+    "debug": "^2.2.0",
+    "expect.js": "*",
+    "lodash": "^3.10.0",
+    "mocha": "*",
+    "uberclass": "^1.0.1"
+  }
+}
