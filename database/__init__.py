@@ -2,6 +2,7 @@ import arkInit
 arkInit.init()
 
 import coren
+import cOS
 
 class Database(object):
 	def __init__(self, apiRoot):
@@ -14,11 +15,18 @@ class Database(object):
 	def find(self, entityType):
 		return self.coren.find(entityType)
 
-	def update(self, entityType, data):
+	def update(self, entityType, data=None):
 		return self.coren.update(entityType, data)
 
 	def delete(self, entityType):
 		return self.coren.delete(entityType)
 
 	def execute(self, queryParams, queryOptions):
-		return self.coren.execute(queryParams, queryOptions)
+		response = self.coren.execute(queryParams, queryOptions)
+		try:
+			print('goasdfa here')
+			response = cOS.unicodeToString(response.json())
+			print('got here')
+		except:
+			pass
+		return response
