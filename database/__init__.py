@@ -17,8 +17,8 @@ class Database(object):
 	def update(self, entityType, data):
 		return self.coren.update(entityType, data)
 
-	def delete(self, entityType):
-		return self.coren.delete(entityType)
+	def remove(self, entityType):
+		return self.coren.remove(entityType)
 
 	def execute(self, queryParams, queryOptions):
 		return self.coren.execute(queryParams, queryOptions)
