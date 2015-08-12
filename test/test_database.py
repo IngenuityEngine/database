@@ -113,20 +113,20 @@ class corenTest(unittest.TestCase):
 		resp = self.coren.find('_user').where('name','is','NewUser').execute()
 		self.assertEqual(len(resp.json()),1)
 		_id = resp.json()[0]['_id']
-		self.coren.delete('_user').where('name','is','NewUser').execute()
+		self.coren.remove('_user').where('name','is','NewUser').execute()
 
 	def test_shouldFindSingleUsers(self):
 		self.coren.create('_user', {'name': 'NewUser', 'password': 'otherPassword'}).execute()
 		resp = self.coren.find('_user').where('name','is','Grant Miller').execute()
 		self.assertEqual(len(resp.json()), 1)
-		resp = self.coren.delete('_user').where('name','is','NewUser').execute()
+		resp = self.coren.remove('_user').where('name','is','NewUser').execute()
 
 	def test_shouldDeleteUser(self):
 		self.coren.create('_user', {'name': 'toDelete'}).execute()
 		resp = self.coren.find('_user').execute()
 		numUsers = len(resp.json())
 		#self.coren.delete('_user').where('name','is','toDelete').execute()
-		resp = self.coren.delete('_user').where('name','is','toDelete').execute()
+		resp = self.coren.remove('_user').where('name','is','toDelete').execute()
 		resp = self.coren.find('_user').execute()
 		self.assertEqual(len(resp.json()), numUsers-1)
 
