@@ -14,7 +14,7 @@ class Database(object):
 	def find(self, entityType):
 		return self.coren.find(entityType)
 
-	def update(self, entityType, data):
+	def update(self, entityType, data=None):
 		return self.coren.update(entityType, data)
 
 	def remove(self, entityType):
