@@ -177,3 +177,4 @@ shared/compiled/templates.js
 # built from server config
 npm-debug.log
 client/compiled/config.js
+client/compiled/config.js
