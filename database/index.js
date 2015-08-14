@@ -28,8 +28,7 @@ init: function(options, callback){
 		if (err)
 			throw err
 		this.coren = coren
-		if (callback)
-			callback()
+		callback()
 	}.bind(this))
 },
 create: function(entityType, data, options, callback)
@@ -60,7 +59,7 @@ empty: function(entityType, options, callback)
 //end of module
 })
 
-module.exports = function factory(cb)
+module.exports = function factory(options, cb)
 {
-	return new corenDatabase(cb)
+	return new corenDatabase(options, cb)
 }
