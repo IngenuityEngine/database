@@ -28,7 +28,8 @@ init: function(options, callback){
 		if (err)
 			throw err
 		this.coren = coren
-		callback()
+		if (callback)
+			callback()
 	}.bind(this))
 },
 create: function(entityType, data, options, callback)
