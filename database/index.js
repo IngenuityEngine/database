@@ -1,4 +1,3 @@
-
 // Vendor Modules
 /////////////////////////
 // var async = require('async')
@@ -13,7 +12,7 @@ var _ = require('lodash')
 // var helpers = require('coren/shared/util/helpers')
 var corenAPI = require('coren/shared/corenAPI')
 
-module.exports = Class.extend({
+var corenDatabase = Class.extend({
 
 init: function(options, callback){
 	if (_.isFunction(options))
@@ -44,8 +43,6 @@ find: function(entityType, queryParams, options, callback)
 
 update: function(entityType, queryParams, datas, options, callback)
 {
-	console.log('entityType is', entityType)
-	console.log(queryParams, datas, options)
 	return this.coren.update(entityType, queryParams, datas, options, callback)
 },
 
@@ -61,3 +58,8 @@ empty: function(entityType, options, callback)
 
 //end of module
 })
+
+module.exports = function factory(options, cb)
+{
+	return new corenDatabase(options, cb)
+}
