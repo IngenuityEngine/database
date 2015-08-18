@@ -54,30 +54,6 @@ remove: function(entityType, queryParams, options, callback)
 empty: function(entityType, options, callback)
 {
 	return this.coren.empty(entityType, options, callback)
-},
-
-retryWrap: function(callbackToWrap)
-{
-	function retry(callback)
-	{
-		try
-		{
-			callbackToWrap(function(err, resp)
-			{
-				if (err)
-				{
-					setTimeout(retry, 500)
-					return
-				}
-				return callback(err, resp)
-			})
-		}
-		catch (err)
-		{
-			setTimeout(retry, 500)
-		}
-	}
-	return retry
 }
 
 //end of module
