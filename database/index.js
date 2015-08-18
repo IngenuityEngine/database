@@ -23,13 +23,32 @@ init: function(options, callback){
 	options = options || {}
 
 	debug('initialize coren database')
-	corenAPI.init(options, function(err, coren)
+
+	var self = this
+	function initCorenAPI()
 	{
-		if (err)
-			throw err
-		this.coren = coren
-		callback()
-	}.bind(this))
+		console.log('trying to init corenAPI')
+		corenAPI.init(options, function(err, coren)
+		{
+			if (err)
+				setTimeout(initCorenAPI, 500)
+			else
+			{
+				self.coren = coren
+				callback()
+			}
+		})
+	}
+
+	try{
+		console.log('initing corenapi')
+		initCorenAPI()
+	}
+	catch (err)
+	{
+		console.log('got here')
+		setTimeout(initCorenAPI, 500)
+	}
 },
 create: function(entityType, data, options, callback)
 {
@@ -38,17 +57,17 @@ create: function(entityType, data, options, callback)
 
 find: function(entityType, queryParams, options, callback)
 {
-	return this.coren.find(entityType, queryParams, options, callback)
+	return this.getQuery(this.coren.find(entityType, queryParams, options, callback))
 },
 
 update: function(entityType, queryParams, datas, options, callback)
 {
-	return this.coren.update(entityType, queryParams, datas, options, callback)
+	return this.getQuery(this.coren.update(entityType, queryParams, datas, options, callback))
 },
 
 remove: function(entityType, queryParams, options, callback)
 {
-	return this.coren.remove(entityType, queryParams, options, callback)
+	return this.getQuery(this.coren.remove(entityType, queryParams, options, callback))
 },
 
 empty: function(entityType, options, callback)
@@ -58,26 +77,112 @@ empty: function(entityType, options, callback)
 
 retryWrap: function(callbackToWrap)
 {
-	function retry(callback)
+	return function wrappedExecute()
 	{
-		try
+		var ogExecute = callbackToWrap
+		console.log('ogExecute:', ogExecute)
+		var ogCallback = arguments[arguments.length - 1]
+		function run()
 		{
-			callbackToWrap(function(err, resp)
+			console.log('running')
+			ogExecute.apply(arguments)
+		}
+		function wrappedCallback()
+		{
+			console.log('wrpaper')
+			var err = arguments[0]
+			if (err)
 			{
-				if (err)
-				{
-					setTimeout(retry, 500)
-					return
-				}
-				return callback(err, resp)
-			})
+
+			console.log('err')
+				setTimeout(wrappedExecute, 500)
+			}
+			else
+			{
+			console.log('win')
+				ogCallback(arguments)
+
+			}
 		}
-		catch (err)
-		{
-			setTimeout(retry, 500)
-		}
+		console.log('run')
+		arguments[arguments.length - 1] = wrappedCallback
+		run()
 	}
-	return retry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// return function retry()
+	// {
+	// 	console.log('ogArguments are', arguments)
+	// 	var ogCallback = arguments[arguments.length -1]
+
+	// 	ogExecute(arguments)
+
+	// 	var err = arguments[0]
+	// 	if (err)
+	// 		return setTimeout(retry(arguments), 500)
+	// 	else
+	// 		ogCallback(arguments)
+		// try
+		// {
+		// 	var retryingCallback = function(err, resp)
+		// 	{
+		// 		if (err)
+		// 		{
+		// 			console.log('oh my god an eerror was found!')
+		// 			throw err
+		// 		}
+		// 		else
+		// 			ogCallback(err, resp)
+		// 	}
+		// 	if (ogArguments.length !== 0)
+		// 		ogArguments[ogArguments.length - 1] = retryingCallback
+		// 	else
+		// 		ogArguments[0] = retryingCallback
+
+		// 	console.log('now ogArguments have turned into ', JSON.stringify(ogArguments))
+		// 	callbackToWrap.apply(this, ogArguments)
+		// }
+		// catch (err)
+		// {
+		// 	console.log('retrying')
+		// 	setTimeout(retry, 500)
+		// }
+	// }
+},
+
+getQuery: function(query)
+{
+	query.execute = this.retryWrap(query.execute)
+	return query
 }
 
 //end of module
