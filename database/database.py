@@ -9,8 +9,13 @@ class Database(object):
 	def __init__(self, apiRoot, keepTrying=False):
 		self.apiRoot = apiRoot
 		self.keepTrying = keepTrying
+
+
+	def connect(self, keepTrying=False):
+		self.keepTrying = keepTrying
 		try:
 			self.coren = coren.Coren(apiRoot)
+			return self
 		except:
 			if self.keepTrying:
 				self.coren = None
@@ -21,8 +26,12 @@ class Database(object):
 						self.coren = coren.Coren(apiRoot)
 					except:
 						pass
+				return self
 			else:
-				raise Exception('The database could not be initialized at %s, please check the connection' % self.apiRoot)
+				return None
+				# return False
+				#raise Exception('The database could not be initialized at %s, please check the connection' % self.apiRoot)
+
 
 	def create(self, entityType, data):
 		return self.coren.create(entityType, data, self.execute)
