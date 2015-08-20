@@ -16,7 +16,6 @@ class Database(object):
 		self.keepTrying = keepTrying
 		try:
 			self.coren = coren.Coren(self.apiRoot)
-			print('we got to having a coren')
 			return self
 		except:
 			if self.keepTrying:
