@@ -9,12 +9,14 @@ class Database(object):
 	def __init__(self, apiRoot, keepTrying=False):
 		self.apiRoot = apiRoot
 		self.keepTrying = keepTrying
+		self.coren = None
 
 
 	def connect(self, keepTrying=False):
 		self.keepTrying = keepTrying
 		try:
-			self.coren = coren.Coren(apiRoot)
+			self.coren = coren.Coren(self.apiRoot)
+			print('we got to having a coren')
 			return self
 		except:
 			if self.keepTrying:
@@ -23,7 +25,7 @@ class Database(object):
 					print('no connection made yet, trying again.')
 					sleep(0.5)
 					try:
-						self.coren = coren.Coren(apiRoot)
+						self.coren = coren.Coren(self.apiRoot)
 					except:
 						pass
 				return self
