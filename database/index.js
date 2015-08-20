@@ -29,7 +29,7 @@ init: function(options, callback){
 	var self = this
 	function initCorenAPI()
 	{
-		console.log('trying to init corenAPI')
+		debug('trying to init corenAPI')
 		corenAPI.init(options, function(err, coren)
 		{
 			if (err)
@@ -48,12 +48,11 @@ init: function(options, callback){
 	}
 
 	try{
-		console.log('initing corenapi')
 		initCorenAPI()
 	}
 	catch (err)
 	{
-		console.log('got here')
+		debug('An error with init coren api that was not called back; retrying')
 		setTimeout(initCorenAPI, 500)
 	}
 },
@@ -84,9 +83,9 @@ empty: function(entityType, options, callback)
 
 retryWrap: function(callbackToWrap)
 {
-
 	var self = this
 
+	//This helper function simply keeps refiring until it completes successfully
 	function tryRequest(onSuccess, onError)
 	{
 		callbackToWrap(function(err, resp)
@@ -98,28 +97,37 @@ retryWrap: function(callbackToWrap)
 		})
 	}
 
+	// This retry function mimics the normal execute() signature
+	// except that the second argument here is a keepTrying option
+	// which can override the database's default override behavior
+	// (which is set by the options given at init)
 	function retry(onSuccess, keepTrying)
 	{
 		if (_.isUndefined(keepTrying))
 			keepTrying = self.keepTrying
 
-		console.log('retry is ', keepTrying)
 		if (keepTrying)
 			{
 				tryRequest(onSuccess, function()
 				{
-					console.log('Failed, retrying...')
+					debug('Failed request, retrying...')
 					retry(onSuccess, keepTrying)
 				})
 			}
 		else
 			callbackToWrap(onSuccess)
 	}
+
 	return retry
 },
 
 getQuery: function(query)
 {
+	// The normal execute is replaced by an execute
+	// that takes an optional keepTrying argument after
+	// the callback
+	// if keepTrying is true, the request will be restarted until
+	// it is successful
 	query.execute = this.retryWrap(query.execute)
 	return query
 }

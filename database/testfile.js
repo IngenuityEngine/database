@@ -1,6 +1,6 @@
 var Database = require('../database')
 
-var db = new Database({coren: {apiRoot:'http://localhost:2020/api/'}, keepTrying: true}, function(){
+var db = new Database({coren: {apiRoot:'http://localhost:2020/api/'}}, function(){
 	console.log('Database initialzied')
 	function findEntities()
 	{
@@ -8,7 +8,7 @@ var db = new Database({coren: {apiRoot:'http://localhost:2020/api/'}, keepTrying
 		{
 			console.log('err is', err)
 			console.log('resp is', resp)
-		})
+		}, true)
 	}
 	setTimeout(findEntities, 3000)
 })
