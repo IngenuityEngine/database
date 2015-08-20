@@ -22,7 +22,7 @@ init: function(options, callback){
 	}
 	options = options || {}
 
-	debug('initialize coren database')
+	debug('initialize coren database with options', options.coren.apiRoot)
 	corenAPI.init(options, function(err, coren)
 	{
 		if (err)
