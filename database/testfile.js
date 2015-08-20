@@ -8,7 +8,7 @@ var db = new Database({coren: {apiRoot:'http://localhost:2020/api/'}}, function(
 		{
 			console.log('err is', err)
 			console.log('resp is', resp)
-		})
+		}, true)
 	}
 	setTimeout(findEntities, 6000)
 })

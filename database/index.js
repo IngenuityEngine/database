@@ -78,11 +78,17 @@ empty: function(entityType, options, callback)
 
 retryWrap: function(callbackToWrap)
 {
-	function keepTrying(onSuccess)
+	function retry(onSuccess, keepTrying)
 	{
-		async.retry({times:14400, interval: 500} , callbackToWrap, onSuccess)
+		if (keepTrying)
+		{
+			console.log('we are retrying')
+			async.retry({times:14400, interval: 500} , callbackToWrap, onSuccess)
+		}
+		else
+			onSuccess.apply(arguments)
 	}
-	return keepTrying
+	return retry
 },
 
 getQuery: function(query)
