@@ -1,7 +1,7 @@
 {
   "name": "database",
   "version": "0.0.1",
-  "main": "./database/index.js",
+  "main": "./database/database.js",
   "scripts": {
     "prepublish": "npm prune",
     "test": "mocha test/*"
