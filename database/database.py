@@ -11,9 +11,10 @@ class Database(object):
 		self.keepTrying = keepTrying
 		self.coren = None
 
+	def connect(self):
+		if self.coren:
+			return
 
-	def connect(self, keepTrying=False):
-		self.keepTrying = keepTrying
 		try:
 			self.coren = coren.Coren(self.apiRoot)
 			return self
@@ -21,7 +22,7 @@ class Database(object):
 			if self.keepTrying:
 				self.coren = None
 				while not self.coren:
-					print('no connection made yet, trying again.')
+					print 'No connection made yet, trying again.'
 					sleep(0.5)
 					try:
 						self.coren = coren.Coren(self.apiRoot)
@@ -35,31 +36,40 @@ class Database(object):
 
 
 	def create(self, entityType, data):
+		self.connect()
 		return self.coren.create(entityType, data, self.execute)
 
 	def find(self, entityType):
+		self.connect()
 		return self.coren.find(entityType, self.execute)
 
 	def update(self, entityType, data=None):
+		self.connect()
 		return self.coren.update(entityType, data, self.execute)
 
 	def remove(self, entityType):
+		self.connect()
 		return self.coren.remove(entityType, self.execute)
 
 	def empty(self, entityType):
+		self.connect()
 		return self.coren.empty(entityType)
 
 	def findOne(self, entityType):
+		self.connect()
 		return self.coren.findOne(entityType)
 
 	def getID(self, entityType):
+		self.connect()
 		return self.coren.getID(entityType, self.execute)
 
 	def getIDByName(self, entityType, name):
+		self.connect()
 		return self.coren.getIDByName(self, entityType, name)
 
 	def execute(self, queryParams, queryOptions, keepTrying=None):
-		if keepTrying is None:
+		self.connect()
+		if keepTrying == None:
 			keepTrying = self.keepTrying
 		try:
 			response = self.coren.execute(queryParams, queryOptions)
