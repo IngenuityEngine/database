@@ -20,6 +20,8 @@ class Database(object):
 				self.coren = coren.Coren(self.apiRoot)
 				return self
 			except:
+				print 'coren:', self.coren
+				print 'keepTrying:', self.keepTrying
 				if self.coren:
 					return self
 				elif not self.keepTrying:
