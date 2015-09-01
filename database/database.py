@@ -13,27 +13,20 @@ class Database(object):
 
 	def connect(self):
 		if self.coren:
-			return
-
-		try:
-			self.coren = coren.Coren(self.apiRoot)
 			return self
-		except:
-			if self.keepTrying:
-				self.coren = None
-				while not self.coren:
+
+		while True:
+			try:
+				self.coren = coren.Coren(self.apiRoot)
+				return self
+			except:
+				if self.coren:
+					return self
+				elif not self.keepTrying:
+					return None
+				else:
 					print 'No connection made yet, trying again.'
 					sleep(0.5)
-					try:
-						self.coren = coren.Coren(self.apiRoot)
-					except:
-						pass
-				return self
-			else:
-				return None
-				# return False
-				#raise Exception('The database could not be initialized at %s, please check the connection' % self.apiRoot)
-
 
 	def create(self, entityType, data):
 		self.connect()
@@ -71,20 +64,16 @@ class Database(object):
 		self.connect()
 		if keepTrying == None:
 			keepTrying = self.keepTrying
-		try:
-			response = self.coren.execute(queryParams, queryOptions)
-			return response
-		except:
-			if keepTrying:
-				response = None
-				while response == None:
-					try:
-						print('Database hasn\'t responded yet, retrying')
-						sleep(0.5)
-						response = self.coren.execute(queryParams, queryOptions)
-					except NotImplementedError:
-						raise
-					except:
-						pass
-			else:
+
+		while True:
+			try:
+				response = self.coren.execute(queryParams, queryOptions)
+				return response
+			except NotImplementedError:
 				raise
+			except:
+				if not keepTrying:
+					break
+				else:
+					print 'Database hasn\'t responded yet, retrying'
+					sleep(0.5)
