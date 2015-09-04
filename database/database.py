@@ -1,4 +1,4 @@
-from time import sleep
+import time
 
 import arkInit
 arkInit.init()
@@ -13,22 +13,25 @@ class Database(object):
 
 	def connect(self):
 		if self.coren:
+			print 'Already have coren'
 			return self
 
 		while True:
 			try:
+				print 'Trying to get a coren'
 				self.coren = coren.Coren(self.apiRoot)
+				print 'returning self'
 				return self
-			except:
+			except Exception as e:
+				print e
 				print 'coren:', self.coren
 				print 'keepTrying:', self.keepTrying
-				if self.coren:
-					return self
-				elif not self.keepTrying:
-					return None
-				else:
+				if self.keepTrying:
 					print 'No connection made yet, trying again.'
-					sleep(0.5)
+					time.sleep(0.5)
+				else:
+					print 'returning None'
+					return None
 
 	def create(self, entityType, data):
 		self.connect()
@@ -74,8 +77,26 @@ class Database(object):
 			except NotImplementedError:
 				raise
 			except:
-				if not keepTrying:
-					break
-				else:
+				if keepTrying:
 					print 'Database hasn\'t responded yet, retrying'
-					sleep(0.5)
+					time.sleep(0.5)
+				else:
+					return None
+
+
+
+def main():
+	while True:
+		print 'db connect'
+		database = Database('http://127.0.0.1:2020/api', keepTrying=True)
+		database.connect()
+		print 'exec find'
+		print database.find('version').limit(1).execute()
+		time.sleep(2)
+
+
+
+
+
+if __name__ == '__main__':
+	main()
