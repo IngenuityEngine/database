@@ -13,24 +13,24 @@ class Database(object):
 
 	def connect(self):
 		if self.coren:
-			print 'Already have coren'
+			# print 'Already have coren'
 			return self
 
 		while True:
 			try:
-				print 'Trying to get a coren'
+				# print 'Trying to get a coren'
 				self.coren = coren.Coren(self.apiRoot)
-				print 'returning self'
+				# print 'returning self'
 				return self
 			except Exception as e:
 				print e
-				print 'coren:', self.coren
-				print 'keepTrying:', self.keepTrying
+				# print 'coren:', self.coren
+				# print 'keepTrying:', self.keepTrying
 				if self.keepTrying:
 					print 'No connection made yet, trying again.'
 					time.sleep(0.5)
 				else:
-					print 'returning None'
+					# print 'returning None'
 					return None
 
 	def create(self, entityType, data):
