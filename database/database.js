@@ -86,15 +86,15 @@ retryWrap: function(callbackToWrap)
 {
 	var self = this
 
-	//This helper function simply keeps refiring until it completes successfully
-	function tryRequest(onSuccess, onError)
+	// This function simply keeps firing until it completes successfully
+	function tryRequest(successCallback, errCallback)
 	{
 		callbackToWrap(function(err, resp)
 		{
 			if (err)
-				process.nextTick(onError)
+				process.nextTick(errCallback)
 			else
-				onSuccess(err, resp)
+				successCallback(err, resp)
 		})
 	}
 
@@ -102,21 +102,21 @@ retryWrap: function(callbackToWrap)
 	// except that the second argument here is a keepTrying option
 	// which can override the database's default override behavior
 	// (which is set by the options given at init)
-	function retry(onSuccess, keepTrying)
+	function retry(successCallback, keepTrying)
 	{
 		if (_.isUndefined(keepTrying))
 			keepTrying = self.keepTrying
 
 		if (keepTrying)
+		{
+			tryRequest(successCallback, function()
 			{
-				tryRequest(onSuccess, function()
-				{
-					debug('Failed request, retrying...')
-					retry(onSuccess, keepTrying)
-				})
-			}
+				debug('Failed request, retrying...')
+				retry(successCallback, keepTrying)
+			})
+		}
 		else
-			callbackToWrap(onSuccess)
+			callbackToWrap(successCallback)
 	}
 
 	return retry
@@ -131,7 +131,7 @@ getQuery: function(query)
 	// it is successful
 	query.execute = this.retryWrap(query.execute)
 	return query
-}
+},
 
 //end of module
 })
