@@ -5,7 +5,6 @@ module.exports = {
         "brand": "Coren",
         "title": "Coren :: Schema and REST",
         "description": "Simple site management",
-        "author": "Grant Miller",
         "css": [
             "/css/base.css"
         ],
@@ -23,9 +22,12 @@ module.exports = {
     },
     "coren": {
         "apiRoot": "http://127.0.0.1:2150/api/",
+        "loginUrl": "/login",
+        "logoutUrl": "/logout",
         "useBackend": true,
         "undo": true,
         "scripts": true,
+        "authenticate": false,
         "dataTypes": {
             "checkbox": {
                 "model": "checkboxFieldModel",
@@ -55,7 +57,8 @@ module.exports = {
             "status": {},
             "text": {},
             "image": {},
-            "orderedListSelection": {}
+            "orderedListSelection": {},
+            "array": {}
         }
     }
 }
