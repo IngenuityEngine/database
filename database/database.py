@@ -1,9 +1,9 @@
+
 # Standard modules
 import time
 import requests
 import json
 
-# https://github.com/IngenuityEngine/coren/wiki/Documentation#rest-implementation
 
 # Our modules
 import arkInit
@@ -13,10 +13,16 @@ import cOS
 import arkUtil
 from query import Query
 
+import settingsManager
+globalSettings = settingsManager.globalSettings()
 
+# https://github.com/IngenuityEngine/coren/wiki/Documentation#rest-implementation
 class Database(object):
 
-	def __init__(self, apiRoot, keepTrying=False):
+	def __init__(self, apiRoot=None, keepTrying=False):
+		if not apiRoot:
+			apiRoot = globalSettings.DATABASE
+
 		self.apiRoot = cOS.ensureEndingSlash(apiRoot)
 		self.keepTrying = keepTrying
 		self.schema = None
