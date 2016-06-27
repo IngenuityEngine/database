@@ -1,4 +1,5 @@
 require("../../node_modules/coren/shared/components/coren_backend")
+require("../../node_modules/coren/shared/components/coren_test")
 
 module.exports = {
     "basics": {
@@ -6,28 +7,43 @@ module.exports = {
         "title": "Coren :: Schema and REST",
         "description": "Simple site management",
         "css": [
+            "/vendor/mocha.css",
             "/css/base.css"
         ],
         "javascript": [
             "/vendor/jquery.js",
+            "/vendor/jquery-sortable.js",
             "/js/main.js"
         ],
         "apps": {
-            "coren_backendAppView": "node_modules/coren/shared/components/coren_backend"
+            "coren_backendAppView": "node_modules/coren/shared/components/coren_backend",
+            "coren_testAppView": "node_modules/coren/shared/components/coren_test"
         },
-        "port": 2150,
+        "rootUrl": "http://127.0.0.1",
+        "port": 2160,
         "fonts": [
             "http://fonts.googleapis.com/css?family=Roboto:100,300,400,500"
+        ],
+        "socketPort": 2260,
+        "socketUrl": "/sockets",
+        "enableSockets": true,
+        "testJavascript": [
+            "/vendor/expect.js",
+            "/vendor/mocha.js"
         ]
     },
     "coren": {
-        "apiRoot": "http://127.0.0.1:2150/api/",
+        "apiRoot": "/api",
         "loginUrl": "/login",
+        "loginFailedUrl": "/login/failed",
+        "loginRedirect": "/backend",
         "logoutUrl": "/logout",
+        "failedUrl": "/login",
         "useBackend": true,
         "undo": true,
         "scripts": true,
-        "authenticate": false,
+        "authenticateURLs": false,
+        "authenticateAPI": false,
         "dataTypes": {
             "checkbox": {
                 "model": "checkboxFieldModel",
@@ -59,6 +75,13 @@ module.exports = {
             "image": {},
             "orderedListSelection": {},
             "array": {}
-        }
+        },
+        "authenticate": false
+    },
+    "ui": {
+        "doubleClickTimeout": 300,
+        "clickThreshold": 10,
+        "flickThreshold": 10,
+        "defaultKeyNamespace": "app"
     }
 }
