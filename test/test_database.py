@@ -13,6 +13,8 @@ database = Database(globalSettings.DATABASE)
 
 class test(tryout.TestSuite):
 
+	title = 'test/test_database.py'
+
 	def setUp(self):
 	 	self.db = Database(globalSettings.DATABASE)
 		self.db = self.db.connect()
