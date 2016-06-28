@@ -37,7 +37,7 @@ init: function(options, callback)
 		var context = {
 			options: options
 		}
-		new Database(context, function(err)
+		self.database = new Database(context, function(err)
 		{
 			if (err)
 			{
@@ -49,8 +49,8 @@ init: function(options, callback)
 			}
 			else
 			{
-				self.database = context.databaseRestful
-				callback(null, self)
+				process.nextTick(callback)
+				// callback(null, self)
 			}
 		})
 	}

@@ -9,14 +9,14 @@ import settingsManager
 globalSettings = settingsManager.globalSettings()
 print 'stuff'
 # print '\n'.join(dir(database))
-database = Database(globalSettings.DATABASE)
+database = Database()
 
 class test(tryout.TestSuite):
 
 	title = 'test/test_database.py'
 
 	def setUp(self):
-	 	self.db = Database(globalSettings.DATABASE)
+	 	self.db = Database()
 		self.db = self.db.connect()
 
 	def tearDown(self):
