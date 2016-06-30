@@ -207,7 +207,7 @@ class Query(object):
 		return self
 
 	def multiple(self, val=True):
-		self.queryOptions['multi'] = val
+		self.queryOptions['multiple'] = val
 		return self
 
 	def getQueryParams(self):
@@ -278,9 +278,6 @@ class Query(object):
 		# self.incFields[field] = val
 		return self
 
-	def updateMultiple(self, val):
-		return self.multiple(val)
-
 	def findOne(self):
 		self.queryOptions['method'] = 'findOne'
 		return self
@@ -298,10 +295,6 @@ class Query(object):
 
 
 	# Removing
-
-	def removeMultiple(self, val):
-		return self.multiple(val)
-
 	# Filters
 
 	def filter_equal(self, field, valA):
