@@ -33,7 +33,7 @@ init: function(options, callback)
 	var self = this
 	function initDatabase()
 	{
-		debug('trying to init corenAPI')
+		debug('trying to init database')
 		var context = {
 			options: options
 		}
@@ -49,7 +49,18 @@ init: function(options, callback)
 			}
 			else
 			{
-				process.nextTick(callback)
+				// fix: prly use setTimeout here instead
+				// so we don't need node.js to run it
+				process.nextTick(function()
+				{
+					self.database.getSchema(function(err, resp)
+					{
+						if (err)
+							return callback(err)
+						self.schema = resp
+						callback(null, self)
+					})
+				})
 				// callback(null, self)
 			}
 		})

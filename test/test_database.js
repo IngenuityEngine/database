@@ -1,7 +1,7 @@
 
 // Vendor Modules
 /////////////////////////
-// var _ = require('lodash')
+var _ = require('lodash')
 var async = require('async')
 
 // Our Modules
@@ -43,8 +43,9 @@ this.bail(true)
 /////////////////////////
 var options = {
 	basics: {
-		rootUrl: 'http://192.168.0.75',
-		port: 80,
+		// rootUrl: 'http://192.168.0.75',
+		rootUrl: 'http://127.0.0.1',
+		port: 2160,
 	},
 	coren: {
 		apiRoot: '/api',
@@ -119,7 +120,7 @@ it('CRUD', function(done) {
 		function removeEntries(callback)
 		{
 			database
-				.update('settings')
+				.remove('settings')
 				.where('key','is','TEST_DatabaseTest')
 				.multiple(true)
 				.execute(function(err, resp)
@@ -139,6 +140,100 @@ it('CRUD', function(done) {
 				removeEntries,
 			], done)
 
+	})
+})
+
+it('increment and push', function(done) {
+	var id
+	new Database(options, function(err, database)
+	{
+		function createEntry(callback)
+		{
+			database.create('test_fields', {
+				text: 'TEST_databaseTest',
+				number: 4,
+				// all _entity's fields
+				multiEntity: _.map(
+					database.schema._entity._fields,
+					'_id'),
+				}, null, function(err, resp)
+				{
+					console.log('err:', err)
+					console.log('resp:', resp)
+					expect(resp.length).to.be(1)
+					expect(resp[0]._id).to.be.ok()
+					id = resp[0]._id
+					callback()
+				})
+		}
+		function firstCheck(callback)
+		{
+
+			database
+				.find('test_fields')
+				.where('_id','is',id)
+				.execute(function(err, resp)
+				{
+					console.log('err:', err)
+					console.log('resp:', resp)
+					expect(resp.length).to.be(1)
+					expect(resp[0]._id).to.be.ok()
+					expect(resp[0].number).to.be(4)
+					callback()
+				})
+		}
+		function incrementAndPush(callback)
+		{
+			database
+				.update('test_fields')
+				.where('_id','is',id)
+				.increment('number', 1)
+				.push('multiEntity',
+					database.schema._field._fields[0])
+				.limit(1)
+				.execute(callback)
+		}
+		function secondCheck(callback)
+		{
+
+			database
+				.find('test_fields')
+				.where('_id','is',id)
+				.execute(function(err, resp)
+				{
+					console.log('err:', err)
+					console.log('resp:', resp)
+					expect(resp.length).to.be(1)
+					expect(resp[0]._id).to.be.ok()
+					expect(resp[0].number).to.be(5)
+					// fix: no check for multiEntity
+					// contents
+					callback()
+				})
+		}
+		function removeEntries(callback)
+		{
+			database
+				.remove('test_fields')
+				.where('text','is','TEST_databaseTest')
+				.multiple(true)
+				.execute(function(err, resp)
+				{
+					console.log('err:', err)
+					console.log('resp:', resp)
+					expect(resp.modified).to.be.greaterThan(0)
+					callback()
+				})
+		}
+
+		async.series(
+			[
+				createEntry,
+				firstCheck,
+				incrementAndPush,
+				secondCheck,
+				removeEntries,
+			], done)
 	})
 })
 
