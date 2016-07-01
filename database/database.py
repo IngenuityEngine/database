@@ -19,6 +19,12 @@ globalSettings = settingsManager.globalSettings()
 # https://github.com/IngenuityEngine/coren/wiki/Documentation#rest-implementation
 class Database(object):
 
+	validApiOptions = [
+		'getLinks',
+		'undo',
+		'multiple',
+		]
+
 	def __init__(self, apiRoot=None, keepTrying=False):
 		if not apiRoot:
 			apiRoot = globalSettings.DATABASE
@@ -139,6 +145,11 @@ class Database(object):
 				else:
 					return None
 
+	def getApiOptions(self, options):
+		# return {k:options[k] for k in options if k in self.validApiOptions}
+		return dict((k, options[k])
+			for k in options if k in self.validApiOptions)
+
 	def _execute(self, queryParams, queryOptions):
 		data = {'_query': json.dumps(queryParams)}
 		data['_options'] = json.dumps(queryOptions)
@@ -160,6 +171,10 @@ class Database(object):
 			response = requests.delete(url, data=data)
 
 		elif queryOptions['method'] == 'create':
+			data = {
+				'_data': queryOptions['data'],
+				'_options': self.getApiOptions(queryOptions)
+			}
 			data = queryOptions['data']
 			response =  requests.post(self.apiRoot + queryOptions['entityType'], json=data)
 

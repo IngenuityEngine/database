@@ -210,6 +210,10 @@ class Query(object):
 		self.queryOptions['multiple'] = val
 		return self
 
+	def enableUndo(self, val=True):
+		self.queryOptions['undo'] = val
+		return self
+
 	def getQueryParams(self):
 		queryParams = {
 			'filter': self.filters,
