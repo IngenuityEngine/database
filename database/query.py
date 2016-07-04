@@ -268,6 +268,9 @@ class Query(object):
 		queryParams = self.getQueryParams()
 		return self.execCallback(queryParams, self.queryOptions)
 
+	def fetch(self):
+		return self.execute()
+
 	def set(self, field, val=None):
 		if val is None:
 			self.queryOptions['data'].update(field)
