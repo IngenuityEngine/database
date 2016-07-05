@@ -8,12 +8,13 @@
   },
   "description": "database",
   "dependencies": {
-    "arkutil": "0.0.4",
+    "arkutil": "*",
     "async": "*",
-    "debug": "^2.2.0",
+    "debug": "^2",
     "expect.js": "*",
-    "lodash": "^3.10.0",
+    "lodash": "^4",
     "mocha": "*",
-    "uberclass": "^1.0.1"
+    "uberclass": "^1",
+    "expect.js": "0"
   }
 }

@@ -207,7 +207,11 @@ class Query(object):
 		return self
 
 	def multiple(self, val=True):
-		self.queryOptions['multi'] = val
+		self.queryOptions['multiple'] = val
+		return self
+
+	def enableUndo(self, val=True):
+		self.queryOptions['undo'] = val
 		return self
 
 	def getQueryParams(self):
@@ -264,6 +268,9 @@ class Query(object):
 		queryParams = self.getQueryParams()
 		return self.execCallback(queryParams, self.queryOptions)
 
+	def fetch(self):
+		return self.execute()
+
 	def set(self, field, val=None):
 		if val is None:
 			self.queryOptions['data'].update(field)
@@ -277,9 +284,6 @@ class Query(object):
 		self.queryOptions['data']['$inc'][field] = val
 		# self.incFields[field] = val
 		return self
-
-	def updateMultiple(self, val):
-		return self.multiple(val)
 
 	def findOne(self):
 		self.queryOptions['method'] = 'findOne'
@@ -298,10 +302,6 @@ class Query(object):
 
 
 	# Removing
-
-	def removeMultiple(self, val):
-		return self.multiple(val)
-
 	# Filters
 
 	def filter_equal(self, field, valA):
