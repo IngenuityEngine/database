@@ -20,6 +20,7 @@ globalSettings = settingsManager.globalSettings()
 class Database(object):
 
 	timeRefresh = 60
+	lastTimeCheck = 0
 
 	validApiOptions = [
 		'getLinks',
@@ -46,8 +47,7 @@ class Database(object):
 				response = response.json()
 				response = arkUtil.unicodeToString(response)
 				self.schema = response
-				self.time = response['_time']
-				self.lastTimeCheck = time.time()
+				self.getTime()
 				return self
 			except Exception as e:
 				print e
@@ -59,13 +59,14 @@ class Database(object):
 
 	def getTime(self):
 		if time.time() > self.lastTimeCheck + self.timeRefresh:
+			self.lastTimeCheck = time.time()
 			self.connect()
 			while True:
 				try:
 					response = requests.get(
 						self.apiRoot + '_time')
-					response = int(response)
-					return response
+					self.time = int(response.json())
+					return self.time
 				except NotImplementedError:
 					raise
 				except:
