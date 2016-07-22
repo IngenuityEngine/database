@@ -19,6 +19,9 @@ globalSettings = settingsManager.globalSettings()
 # https://github.com/IngenuityEngine/coren/wiki/Documentation#rest-implementation
 class Database(object):
 
+	timeRefresh = 60
+	lastTimeCheck = 0
+
 	validApiOptions = [
 		'getLinks',
 		'undo',
@@ -44,6 +47,7 @@ class Database(object):
 				response = response.json()
 				response = arkUtil.unicodeToString(response)
 				self.schema = response
+				self.getTime()
 				return self
 			except Exception as e:
 				print e
@@ -52,6 +56,28 @@ class Database(object):
 					time.sleep(0.5)
 				else:
 					return None
+
+	def getTime(self):
+		if time.time() > self.lastTimeCheck + self.timeRefresh:
+			self.lastTimeCheck = time.time()
+			self.connect()
+			while True:
+				try:
+					response = requests.get(
+						self.apiRoot + '_time')
+					self.time = int(response.json())
+					return self.time
+				except NotImplementedError:
+					raise
+				except:
+					if self.keepTrying:
+						print 'Database hasn\'t responded yet, retrying'
+						time.sleep(0.5)
+					else:
+						return None
+
+		timePassed = time.time() - self.lastTimeCheck
+		return self.time + timePassed
 
 	def create(self, entityType, data, callback=None):
 		queryOptions = {
@@ -127,6 +153,11 @@ class Database(object):
 		except:
 			return None
 
+	def getApiOptions(self, options):
+		# return {k:options[k] for k in options if k in self.validApiOptions}
+		return dict((k, options[k])
+			for k in options if k in self.validApiOptions)
+
 	def execute(self, queryParams, queryOptions, keepTrying=None):
 		self.connect()
 		if keepTrying == None:
@@ -144,11 +175,6 @@ class Database(object):
 					time.sleep(0.5)
 				else:
 					return None
-
-	def getApiOptions(self, options):
-		# return {k:options[k] for k in options if k in self.validApiOptions}
-		return dict((k, options[k])
-			for k in options if k in self.validApiOptions)
 
 	def _execute(self, queryParams, queryOptions):
 		data = {'_query': json.dumps(queryParams)}
