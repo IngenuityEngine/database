@@ -43,7 +43,6 @@ this.bail(true)
 /////////////////////////
 var options = {
 	basics: {
-		// rootUrl: 'http://192.168.0.75',
 		rootUrl: 'http://127.0.0.1',
 		port: 2160,
 	},
