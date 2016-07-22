@@ -162,7 +162,6 @@ class Database(object):
 
 		elif queryOptions['method'] == 'update':
 			data.update(queryOptions['data'])
-			print('data is ', data)
 			url = self.apiRoot + queryOptions['entityType']
 			response = requests.put(url, json = data)
 
