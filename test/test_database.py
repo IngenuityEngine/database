@@ -1,4 +1,6 @@
 
+import time
+
 import arkInit
 arkInit.init()
 
@@ -7,8 +9,6 @@ from database import Database
 
 import settingsManager
 globalSettings = settingsManager.globalSettings()
-print 'stuff'
-# print '\n'.join(dir(database))
 database = Database()
 
 class test(tryout.TestSuite):
@@ -65,6 +65,15 @@ class test(tryout.TestSuite):
 			.where('formalName','is','Related')\
 			.execute()
 		self.assertTrue(len(resp) < numFields)
+
+	def shouldHaveTime(self):
+		timeA = self.db.getTime()
+		print 'timeA:', '%d' % timeA
+		self.assertTrue(timeA != 0)
+		time.sleep(3)
+		timeB = self.db.getTime()
+		print 'timeB:', '%d' % timeB
+		self.assertTrue(timeB > timeA + 2)
 
 	# def shouldCreateField(self):
 	# 	resp = self.db.find('_field').execute()

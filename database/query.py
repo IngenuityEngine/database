@@ -22,7 +22,7 @@ class Query(object):
 
 	defaultSortOrder = 1
 	defaultPgCount = 20
-	timeEnumMap= {
+	timeEnumMap = {
 		'seconds': ['s', 'sec', 'secs', 'second'],
 		'minutes': ['m', 'min', 'mins', 'minute', 'minutes'],
 		'hours': ['h', 'hr', 'hrs', 'hour', 'hours'],
