@@ -43,6 +43,7 @@ class Database(object):
 		while True:
 			try:
 				self.schema = None
+				print 'connecting to :', self.apiRoot + '_schema'
 				response = requests.get(self.apiRoot + '_schema')
 				response = response.json()
 				response = arkUtil.unicodeToString(response)
@@ -59,17 +60,14 @@ class Database(object):
 
 	def getTime(self):
 		if time.time() > self.lastTimeCheck + self.timeRefresh:
-			self.lastTimeCheck = time.time()
-			self.connect()
 			while True:
 				try:
-					response = requests.get(
-						self.apiRoot + '_time')
+					response = requests.get(self.apiRoot + '_time')
 					self.time = int(response.json())
+					self.lastTimeCheck = time.time()
 					return self.time
-				except NotImplementedError:
-					raise
-				except:
+				except Exception as e:
+					print e
 					if self.keepTrying:
 						print 'Database hasn\'t responded yet, retrying'
 						time.sleep(0.5)
