@@ -14,19 +14,12 @@ var Database = require('coren/client/database_restful')
 
 var corenDatabase = Class.extend({
 
-init: function(options, callback)
+init: function(context, callback)
 {
 	_.bindAll(this, _.functionsIn(this))
 
-	if (_.isFunction(options))
-	{
-		callback = options
-		options = {}
-	}
-	options = options || {}
-
-	debug('initialize coren database with options', options)
-	this.keepTrying = options.keepTrying || false
+	debug('initialize coren database with options', context.options)
+	this.keepTrying = context.options.keepTrying || false
 
 	debug('initialize coren database')
 
@@ -34,9 +27,6 @@ init: function(options, callback)
 	function initDatabase()
 	{
 		debug('trying to init database')
-		var context = {
-			options: options
-		}
 		self.database = new Database(context, function(err)
 		{
 			if (err)
@@ -58,6 +48,7 @@ init: function(options, callback)
 						if (err)
 							return callback(err)
 						self.schema = resp
+						context.database = self
 						callback(null, self)
 					})
 				})
