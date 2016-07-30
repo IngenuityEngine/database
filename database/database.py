@@ -1,5 +1,6 @@
 
 # Standard modules
+import os
 import time
 import requests
 import json
@@ -32,6 +33,12 @@ class Database(object):
 		if not apiRoot:
 			apiRoot = globalSettings.DATABASE
 
+		self.key = None
+		keyFile = os.environ.get('ARK_CONFIG') + 'key.dat'
+		if os.path.isfile(keyFile):
+			with open(keyFile) as f:
+				self.key = f.readlines()[0].strip()
+
 		self.apiRoot = cOS.ensureEndingSlash(apiRoot)
 		self.keepTrying = keepTrying
 		self.schema = None
@@ -44,7 +51,7 @@ class Database(object):
 			try:
 				self.schema = None
 				print 'connecting to :', self.apiRoot + '_schema'
-				response = requests.get(self.apiRoot + '_schema')
+				response = self.get(self.apiRoot + '_schema')
 				response = response.json()
 				response = arkUtil.unicodeToString(response)
 				self.schema = response
@@ -62,7 +69,7 @@ class Database(object):
 		if time.time() > self.lastTimeCheck + self.timeRefresh:
 			while True:
 				try:
-					response = requests.get(self.apiRoot + '_time')
+					response = self.get(self.apiRoot + '_time')
 					self.time = int(response.json())
 					self.lastTimeCheck = time.time()
 					return self.time
@@ -174,6 +181,25 @@ class Database(object):
 				else:
 					return None
 
+	def getCookie(self):
+		if self.key:
+			return {'oauthToken': self.key}
+		return {}
+
+	# wrap request methods w/ getCookie and normalize data name
+	def get(self, url, params=None):
+		return requests.get(url, params=params, cookies=self.getCookie())
+
+	def put(self, url, data=None):
+		return requests.put(url, json=data, cookies=self.getCookie())
+
+	def post(self, url, data=None):
+		return requests.post(url, json=data, cookies=self.getCookie())
+
+	def delete(self, url, data=None):
+		return requests.delete(url, data=data, cookies=self.getCookie())
+
+	# called on query.execute
 	def _execute(self, queryParams, queryOptions):
 		data = {'_query': json.dumps(queryParams)}
 		data['_options'] = json.dumps(queryOptions)
@@ -182,16 +208,16 @@ class Database(object):
 
 		if queryOptions['method'] in ['read', 'findOne', 'getID']:
 			url = self.apiRoot + queryOptions['entityType']
-			response = requests.get(self.apiRoot + queryOptions['entityType'], params=data)
+			response = self.get(self.apiRoot + queryOptions['entityType'], params=data)
 
 		elif queryOptions['method'] == 'update':
 			data.update(queryOptions['data'])
 			url = self.apiRoot + queryOptions['entityType']
-			response = requests.put(url, json = data)
+			response = self.put(url, data=data)
 
 		elif queryOptions['method'] == 'delete':
 			url = self.apiRoot + queryOptions['entityType']
-			response = requests.delete(url, data=data)
+			response = self.delete(url, data=data)
 
 		elif queryOptions['method'] == 'create':
 			data = {
@@ -199,24 +225,28 @@ class Database(object):
 				'_options': self.getApiOptions(queryOptions)
 			}
 			data = queryOptions['data']
-			response =  requests.post(self.apiRoot + queryOptions['entityType'], json=data)
+			response =  self.post(self.apiRoot + queryOptions['entityType'], data=data)
 
 		else:
 			raise NotImplementedError('The command method is not one of the supported CRUD methods')
 
 		try:
-			response = response.json()
-			response = arkUtil.unicodeToString(response)
-			if queryOptions['method'] == 'findOne':
-				if response:
-					response = response[0]
-				else:
-					response = []
-			if queryOptions['method'] == 'getID':
-				if response:
-					response = response[0]['_id']
-				else:
-					response = []
+			if response.status_code == 200:
+				response = response.json()
+				response = arkUtil.unicodeToString(response)
+				if queryOptions['method'] == 'findOne':
+					if response:
+						response = response[0]
+					else:
+						response = []
+				if queryOptions['method'] == 'getID':
+					if response:
+						response = response[0]['_id']
+					else:
+						response = []
+			else:
+				print 'response status:', response.status_code
+				raise response.json()
 		except Exception as err:
 			raise err
 			# raise Exception('A network error occured; ', response)

@@ -22,11 +22,24 @@ class test(tryout.TestSuite):
 	def tearDown(self):
 		pass
 
-	def shouldFindEntity(self):
-		test = self.db.find('_entity')\
+	def shouldHaveAKey(self):
+		print self.db.key
+		self.assertTrue(self.db.key != None)
+		self.assertTrue('\n' not in self.db.key)
+
+	def shouldNotWorkWithoutAKey(self):
+		self.db.key = 'banana'
+		resp = self.db.find('_entity')\
 			.where('name','is','_field')\
 			.execute()
-		self.assertEqual(len(test), 1)
+		print 'resp:', resp
+		self.assertEqual(resp, None)
+
+	def shouldFindEntity(self):
+		resp = self.db.find('_entity')\
+			.where('name','is','_field')\
+			.execute()
+		self.assertEqual(len(resp), 1)
 
 	def shouldListEntities(self):
 		resp = self.db.find('_entity').execute()
