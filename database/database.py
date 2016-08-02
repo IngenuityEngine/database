@@ -34,10 +34,23 @@ class Database(object):
 			apiRoot = globalSettings.DATABASE
 
 		self.key = None
-		keyFile = os.environ.get('ARK_CONFIG') + 'key.dat'
-		if os.path.isfile(keyFile):
+		keyFile = os.environ.get('ARK_CONFIG') + 'key.user.dat'
+		try:
 			with open(keyFile) as f:
 				self.key = f.readlines()[0].strip()
+			print 'Using user key'
+		except:
+			pass
+
+		if not self.key:
+			print 'Using default database key'
+			keyFile = os.environ.get('ARK_CONFIG') + 'key.dat'
+			try:
+				with open(keyFile) as f:
+					self.key = f.readlines()[0].strip()
+			except Exception as err:
+				print 'Could not load default database key'
+				raise err
 
 		self.apiRoot = cOS.ensureEndingSlash(apiRoot)
 		self.keepTrying = keepTrying

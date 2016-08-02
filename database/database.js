@@ -5,7 +5,7 @@ var Class = require('uberclass')
 var debug = require('debug')('shepherd:db_coren')
 var _ = require('lodash')
 var Query = require('coren/shared/query')
-
+var cOS = require('coren/node_modules/commonos')
 
 // Our Modules
 /////////////////////////
@@ -43,6 +43,7 @@ init: function(context, callback)
 				// so we don't need node.js to run it
 				process.nextTick(function()
 				{
+					self.database.setKey(self.key)
 					self.database.getSchema(function(err, resp)
 					{
 						if (err)
@@ -57,16 +58,23 @@ init: function(context, callback)
 		})
 	}
 
-	try
+	cOS.readFile('c:/ie/config/key.user.dat', function(err, data)
 	{
-		initDatabase()
-	}
-	catch (err)
-	{
-		throw err
-		// debug('An error with init coren api that was not called back; retrying')
-		// setTimeout(initDatabase, 500)
-	}
+		if (err)
+			throw err
+		self.key = data.trim()
+		console.log('key is:', self.key)
+		try
+		{
+			initDatabase()
+		}
+		catch (err)
+		{
+			throw err
+			// debug('An error with init coren api that was not called back; retrying')
+			// setTimeout(initDatabase, 500)
+		}
+	})
 },
 create: function(entityType, data, options, callback)
 {
