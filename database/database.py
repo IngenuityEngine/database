@@ -42,7 +42,10 @@ class Database(object):
 		self.apiRoot = cOS.ensureEndingSlash(apiRoot)
 		self.keepTrying = keepTrying
 		self.schema = None
+		self.health = None
 
+	# Initial connection to database will call database.connect()
+	# Afterwards, for .execute() commands, just use health
 	def connect(self):
 		if self.schema:
 			return self
@@ -65,14 +68,36 @@ class Database(object):
 				else:
 					return None
 
+	def health(self):
+		if self.health:
+			return self
+
+		while True:
+			try:
+				self.health = None
+				print 'checking health at :', self.apiRoot + '_health'
+				response = self.get(self.apiRoot + '_health')
+				response = response.json()
+				response = arkUtil.unicodeToString(response)
+				self.health = response
+				self.getTime()
+				return self
+			except Exception as e:
+				print e
+				if self.keepTrying:
+					print 'No connection made yet, trying again.'
+					time.sleep(0.5)
+				else:
+					return None
+
 	def getTime(self):
 		if time.time() > self.lastTimeCheck + self.timeRefresh:
 			while True:
 				try:
 					response = self.get(self.apiRoot + '_time')
-					self.time = int(response.json())
+					self.lastTime = int(response.json())
 					self.lastTimeCheck = time.time()
-					return self.time
+					return self.lastTime
 				except Exception as e:
 					print e
 					if self.keepTrying:
@@ -82,7 +107,10 @@ class Database(object):
 						return None
 
 		timePassed = time.time() - self.lastTimeCheck
-		return self.time + timePassed
+		return self.lastTime + timePassed
+
+	def getQuery(self, entityType, callback, queryOptions):
+		return Query(entityType, self.getTime(), callback, queryOptions)
 
 	def create(self, entityType, data, callback=None):
 		queryOptions = {
@@ -91,7 +119,7 @@ class Database(object):
 			'data': data
 			}
 		callback = callback or self.execute
-		return Query(entityType, callback, queryOptions)
+		return self.getQuery(entityType, callback, queryOptions)
 
 	def find(self, entityType, callback=None):
 		queryOptions = {
@@ -99,7 +127,7 @@ class Database(object):
 			'entityType': entityType,
 			}
 		callback = callback or self.execute
-		return Query(entityType, callback, queryOptions)
+		return self.getQuery(entityType, callback, queryOptions)
 
 	def update(self, entityType, data=None, callback=None):
 		queryOptions = {
@@ -109,7 +137,7 @@ class Database(object):
 		if data:
 			queryOptions['data'] = data
 		callback = callback or self.execute
-		return Query(entityType, callback, queryOptions)
+		return self.getQuery(entityType, callback, queryOptions)
 
 	def remove(self, entityType, callback=None):
 		queryOptions = {
@@ -117,14 +145,14 @@ class Database(object):
 			'entityType': entityType,
 			}
 		callback = callback or self.execute
-		return Query(entityType, callback, queryOptions)
+		return self.getQuery(entityType, callback, queryOptions)
 
 	def empty(self, entityType):
 		queryOptions = {
 			'method': 'delete',
 			'entityType': entityType
 		}
-		emptyQuery = Query(entityType, self.execute, queryOptions)
+		emptyQuery = self.getQuery(entityType, self.execute, queryOptions)
 		emptyQuery.multiple(True)
 		response = self.execute(emptyQuery.getQueryParams(), emptyQuery.queryOptions)
 		return response
@@ -135,7 +163,7 @@ class Database(object):
 			'entityType': entityType
 		}
 		callback = callback or self.execute
-		return Query(entityType, callback, queryOptions)
+		return self.getQuery(entityType, callback, queryOptions)
 
 	def getID(self, entityType, callback=None):
 		queryOptions = {
@@ -143,14 +171,14 @@ class Database(object):
 			'entityType': entityType
 		}
 		callback = callback or self.execute
-		return Query(entityType, callback, queryOptions)
+		return self.getQuery(entityType, callback, queryOptions)
 
 	def getIDByName(self, entityType, name):
 		queryOptions = {
 			'method': 'read',
 			'entityType': entityType
 		}
-		query = Query(entityType, self.execute, queryOptions)
+		query = self.getQuery(entityType, self.execute, queryOptions)
 		query = query.where('name', 'is', name)
 		response = self.execute(query.getQueryParams(), query.queryOptions)
 		try:
@@ -164,7 +192,7 @@ class Database(object):
 			for k in options if k in self.validApiOptions)
 
 	def execute(self, queryParams, queryOptions, keepTrying=None):
-		self.connect()
+		self.health()
 		if keepTrying == None:
 			keepTrying = self.keepTrying
 

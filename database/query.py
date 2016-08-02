@@ -17,7 +17,6 @@ import arkInit
 arkInit.init()
 import arkUtil
 
-
 class Query(object):
 
 	defaultSortOrder = 1
@@ -38,9 +37,10 @@ class Query(object):
 	regex_onlyCharacters = re.compile('[A-Za-z]+')
 	regex_nonCharacters = re.compile('[^A-Za-z]')
 
-	def __init__(self, entityType, execCallback=None, queryOptions={}):
+	def __init__(self, entityType, time, execCallback=None, queryOptions={}):
 		self.entityType = entityType
 		self.reset()
+		self.time = time
 		self.queryOptions = queryOptions
 		if 'data' not in self.queryOptions:
 			self.queryOptions['data'] = {}
@@ -431,8 +431,8 @@ class Query(object):
 		# -2 is day + -2 to day + -3
 		if valA >= 0:
 			valA += 1
-		start = (arrow.utcnow().floor('day') + timedelta(days=valA-1)).timestamp
-		end = (arrow.utcnow().floor('day') + timedelta(days=valA)).timestamp
+		start = (arrow.get(self.time).floor('day') + timedelta(days=valA-1)).timestamp
+		end = (arrow.get(self.time).floor('day') + timedelta(days=valA)).timestamp
 		return self.filter_between(field, start, end)
 
 	def filter_inCalendarWeek(self, field, valA):
@@ -440,8 +440,8 @@ class Query(object):
 		if valA >= 0:
 			valA += 1
 
-		start = (arrow.utcnow().floor('week') + timedelta(weeks=valA-1)).timestamp
-		end = (arrow.utcnow().floor('week') + timedelta(weeks=valA)).timestamp
+		start = (arrow.get(self.time).floor('week') + timedelta(weeks=valA-1)).timestamp
+		end = (arrow.get(self.time).floor('week') + timedelta(weeks=valA)).timestamp
 		return self.filter_between(field, start, end)
 
 	def filter_inCalendarMonth(self, field, valA):
@@ -449,8 +449,8 @@ class Query(object):
 		if valA >= 0:
 			valA += 1
 
-		start = (arrow.utcnow().floor('month') + timedelta(days=(valA-1)*30)).timestamp
-		end = (arrow.utcnow().floor('month') + timedelta(days=(valA)*30)).timestamp
+		start = (arrow.get(self.time).floor('month') + timedelta(days=(valA-1)*30)).timestamp
+		end = (arrow.get(self.time).floor('month') + timedelta(days=(valA)*30)).timestamp
 		return (self.filter_between(field, start, end))
 
 	def filter_exists(self, field):
