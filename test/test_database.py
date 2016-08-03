@@ -22,6 +22,9 @@ class test(tryout.TestSuite):
 	def tearDown(self):
 		pass
 
+	def shouldCheckHealth(self):
+		self.assertEqual(self.db.checkHealth(), True)
+
 	def shouldHaveAKey(self):
 		print self.db.key
 		self.assertTrue(self.db.key != None)

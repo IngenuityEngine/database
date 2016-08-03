@@ -81,20 +81,15 @@ class Database(object):
 				else:
 					return None
 
-	def health(self):
-		if self.health:
-			return self
-
+	def checkHealth(self):
 		while True:
 			try:
-				self.health = None
 				print 'checking health at :', self.apiRoot + '_health'
 				response = self.get(self.apiRoot + '_health')
 				response = response.json()
 				response = arkUtil.unicodeToString(response)
-				self.health = response
-				self.getTime()
-				return self
+				if response is 1:
+					return True
 			except Exception as e:
 				print e
 				if self.keepTrying:
@@ -205,7 +200,7 @@ class Database(object):
 			for k in options if k in self.validApiOptions)
 
 	def execute(self, queryParams, queryOptions, keepTrying=None):
-		self.health()
+		self.checkHealth()
 		if keepTrying == None:
 			keepTrying = self.keepTrying
 
