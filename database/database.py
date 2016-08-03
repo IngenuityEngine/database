@@ -85,9 +85,7 @@ class Database(object):
 		while True:
 			try:
 				print 'checking health at :', self.apiRoot + '_health'
-				response = self.get(self.apiRoot + '_health')
-				response = response.json()
-				response = arkUtil.unicodeToString(response)
+				response = str(self.get(self.apiRoot + '_health'))
 				if response is 1:
 					return True
 			except Exception as e:
