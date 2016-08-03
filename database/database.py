@@ -85,7 +85,8 @@ class Database(object):
 		while True:
 			try:
 				print 'checking health at :', self.apiRoot + '_health'
-				response = str(self.get(self.apiRoot + '_health'))
+				response = self.get(self.apiRoot + '_health')
+				response = int(response.json())
 				if response is 1:
 					return True
 			except Exception as e:
