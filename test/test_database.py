@@ -91,15 +91,24 @@ class test(tryout.TestSuite):
 		print 'timeB:', '%d' % timeB
 		self.assertTrue(timeB > timeA + 2)
 
-	# def shouldCreateField(self):
-	# 	resp = self.db.find('_field').execute()
-	# 	numEntities = len(resp.json())
-	# 	self.db.create('_field', {'name': 'newstuff'}).execute()
-	# 	resp = self.db.find('_field').execute()
-	# 	self.assertEqual(len(resp.json()), numEntities+1)
-	# 	resp = self.db.find('_entity').where('name','is','newstuff').execute()
-	# 	self.assertEqual(len(resp.json()), 1)
-	# 	_id = resp.json()[0]['_id']
+	def shouldCreateAnEntry(self):
+		resp = self.db.create('test_fields',{'text': 'banana'}).execute()
+		self.assertTrue(resp[0]['_id'] is not None)
+
+	def shouldUpdateAnEntry(self):
+		self.db.remove('test_fields').multiple().execute()
+		og = self.db.create('test_fields',{'text': 'taco'}).execute()
+		self.db.create('test_fields',{'text': 'robot'}).execute()
+		resp = self.db\
+			.update('test_fields')\
+			.where('_id','is',og[0]['_id'])\
+			.set('text','jungle')\
+			.execute()
+		print 'resp:', resp
+		self.assertEqual(resp['modified'], 1)
+		found = self.db.find('test_fields').where('text','is','jungle').execute()
+		print 'found:', found
+		self.assertEqual(found[0]['_id'], og[0]['_id'])
 
 	# def shouldListUsers(self):
 	# 	resp = self.db.find('user').execute()

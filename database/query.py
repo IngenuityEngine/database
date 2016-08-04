@@ -289,7 +289,6 @@ class Query(object):
 		self.queryOptions['method'] = 'findOne'
 		return self
 
-
 	def options(self, key, val):
 		#var attrs
 		# handle both `"key", value` and `{key: value}` -style arguments.
@@ -300,8 +299,6 @@ class Query(object):
 
 		return self
 
-
-	# Removing
 	# Filters
 
 	def filter_equal(self, field, valA):
@@ -317,7 +314,6 @@ class Query(object):
 		filterObj = {}
 		filterObj[field] = {'$ne': valA}
 		return filterObj
-
 
 	def _getInValues(self, field, val):
 		if isinstance(val, str):
