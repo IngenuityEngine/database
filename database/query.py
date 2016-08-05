@@ -112,7 +112,6 @@ class Query(object):
 		if not isinstance(filters[0], list):
 			filters = [filters]
 
-
 		#var field, fullFieldName, operator, valA, valB, filterObj
 		compiled = {}
 		for queryFilter in filters:
