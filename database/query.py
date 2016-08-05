@@ -9,8 +9,8 @@
 import re
 from numbers import Number
 import collections
-from datetime import timedelta, datetime
-import time
+from datetime import timedelta
+# import time
 import arrow
 from dateutil.relativedelta import *
 import arkInit
@@ -409,13 +409,13 @@ class Query(object):
 		return filterObj
 
 	def filter_inNext(self, field, valA, valB=None):
-		start = self.now()
+		start = self.time
 		end = self.getTimeVal(valA, valB)
 		return self.filter_between(field, start, end)
 
 	def filter_inLast(self, field, valA, valB=None):
 		start = self.getTimeVal(valA, valB)
-		end = self.now()
+		end = self.time
 		return self.filter_between(field, start, end)
 
 	def filter_inCalenderDay(self, field, valA):
@@ -521,19 +521,20 @@ class Query(object):
 		if not timeVal:
 			return 0
 
-		now = datetime.utcnow()
+		now = arrow.get(self.time)
 		relativeTimeArgs = {timeVal['unit'] : timeVal['num']}
 		next = now + relativedelta(**relativeTimeArgs)
 
+		print 'next:', next
 		return (arrow.get(next).timestamp)
 
 	# Helpers
 
-
+	# Deprecated: now just using database.getTime(), passed in to init
 	# "heading, body author ,  created"
 	# becomes [heading, body, author, created]
-	def now(self):
-		return int(time.time())
+	# def now(self):
+	# 	return int(time.time())
 
 	def parseParam(self, val, *args):
 		# if args has multiple values, use that as an array:
