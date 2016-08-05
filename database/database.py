@@ -84,7 +84,7 @@ class Database(object):
 	def checkHealth(self):
 		while True:
 			try:
-				print 'checking health at :', self.apiRoot + '_health'
+				# print 'checking health at :', self.apiRoot + '_health'
 				response = self.get(self.apiRoot + '_health')
 				response = int(response.json())
 				if response is 1:
