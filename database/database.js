@@ -58,7 +58,7 @@ init: function(context, callback)
 		})
 	}
 
-	cOS.readFile('c:/ie/config/key.user.dat', function(err, data)
+	cOS.readFile('../../config/key.user.dat', function(err, data)
 	{
 		if (err)
 			throw err
