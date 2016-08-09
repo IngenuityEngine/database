@@ -57,8 +57,8 @@ class Query(object):
 			'notin'             : self.filter_notIn,
 
 			# Numbers
-			'lessthan'          : '$lt',
-			'greaterthan'       : '$gt',
+			'lessthan'          : self.filter_lessThan,
+			'greaterthan'       : self.filter_greaterThan,
 			# range and betweens are inclusive
 			'between'           : self.filter_between,
 			# not between is exclusive
@@ -77,6 +77,7 @@ class Query(object):
 			# s | m | hr | d | w | mn | y
 			'innext'           : self.filter_inNext,
 			'inlast'           : self.filter_inLast,
+			'notinlast'        : self.filter_notInLast,
 			# offset, ex: 0 = today, 1 = tomorrow, -1 = yesterday
 			'incalendarday'    : self.filter_inCalenderDay,
 			# offset, ex: 0 = self week, 1 = next week, -1 = last week
@@ -340,16 +341,28 @@ class Query(object):
 		filterObj[field] = {'$in': inValues}
 		return filterObj
 
-	def filter_all(self, field, valA):
-		filterObj = {}
-		allValues = self.getInValues(field, valA)
-		filterObj[field] = {'$all': allValues}
-		return filterObj
-
 	def filter_notIn(self, field, valA):
 		filterObj = {}
 		inValues = self._getInValues(field, valA)
 		filterObj[field] = {'$nin': inValues}
+		return filterObj
+
+	def filter_all(self, field, valA):
+		filterObj = {}
+		allValues = self._getInValues(field, valA)
+		filterObj[field] = {'$all': allValues}
+		return filterObj
+
+	def filter_lessThan(self, field, valA):
+		filterObj = {}
+		valA = arkUtil.ensureNumber(valA)
+		filterObj[field] = {'$lt': valA}
+		return filterObj
+
+	def filter_greaterThan(self, field, valA):
+		filterObj = {}
+		valA = arkUtil.ensureNumber(valA)
+		filterObj[field] = {'$gt': valA}
 		return filterObj
 
 	def filter_between(self, field, valA, valB):

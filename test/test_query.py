@@ -159,6 +159,22 @@ class test(tryout.TestSuite):
 				'name':{ '$in': ['_entity','_field']}
 			})
 
+	def shouldWhereWithNOTIN(self):
+		#self.entityQuery.reset()
+		self.entityQuery.where('name', 'not in', ['_entity', '_field'])
+		self.assertEqual(self.entityQuery.filters,
+			{
+				'name':{ '$nin': ['_entity','_field']}
+			})
+
+	def shouldWhereWithALL(self):
+		#self.entityQuery.reset()
+		self.entityQuery.where('name', 'all', ['_entity', '_field'])
+		self.assertEqual(self.entityQuery.filters,
+			{
+				'name':{ '$all': ['_entity','_field']}
+			})
+
 	def shouldWhereWithINasString(self):
 		self.entityQuery.where('name','in','_entity, _field')
 		self.assertEqual(self.entityQuery.filters,
@@ -176,6 +192,16 @@ class test(tryout.TestSuite):
 				'created': {'$lt': now}
 			})
 
+	def shouldWherewithGREATERTHAN (self):
+		now = arrow.utcnow().timestamp
+		self.entityQuery.where('name','in','_entity, _field') #whyyyy
+		self.entityQuery.where('created','greater than', now)
+		self.assertEqual(self.entityQuery.filters,
+			{
+				'name': {'$in': ['_entity','_field']},
+				'created': {'$gt': now}
+			})
+
 	def shouldWhereWithBETWEEN(self):
 		dayAgo = (arrow.utcnow() - timedelta(days=1)).timestamp
 		now = arrow.utcnow().timestamp
@@ -188,7 +214,7 @@ class test(tryout.TestSuite):
 				}
 			})
 
-	def shouldWhereWithContains(self):
+	def shouldWhereWithCONTAINS(self):
 		self.entityQuery.reset().where('name','contains', 'tity')
 		self.assertEqual(self.entityQuery.filters,
 			{
@@ -202,6 +228,10 @@ class test(tryout.TestSuite):
 				'name':{'$regex': '^((?!tity).)*$', '$options':'i'}
 			})
 
+	# def shouldWhereWithSTARTSWITH(self):
+
+	# def shouldWhereWithENDSWITH(self):
+
 	def shouldWhereWithINNEXT(self):
 		self.entityQuery.reset().where('created','inNext','1','month')
 		self.assertIn('created', self.entityQuery.filters)
@@ -214,26 +244,36 @@ class test(tryout.TestSuite):
 		self.assertIn('$gte', self.entityQuery.filters['created'])
 		self.assertIn('$lte', self.entityQuery.filters['created'])
 
+	def shouldWhereWithNOTINLAST(self):
+		self.entityQuery.reset().where('created','not in last','1','month')
+		self.assertIn('created', self.entityQuery.filters)
+		self.assertIn('$lt', self.entityQuery.filters['created'])
+
 	def shouldWhereWithINNEXTwithOneM(self):
 		self.entityQuery.reset().where('created','inNext','1m')
 		self.assertIn('created', self.entityQuery.filters)
 		self.assertIn('$gte', self.entityQuery.filters['created'])
 		self.assertIn('$lte', self.entityQuery.filters['created'])
 
-	def shouldwherewithinCalendarDay(self):
+	def shouldwherewithINCALENDARDAY(self):
 		self.entityQuery.reset().where('created','inCalendarDay','0')
 		self.assertIn('$gte', self.entityQuery.filters['created'])
 		self.assertIn('$lte', self.entityQuery.filters['created'])
 
-	def shouldwherewithinCalendarWeek(self):
+	def shouldwherewithINCALENDARWEEK(self):
 		self.entityQuery.reset().where('created','inCalendarWeek','0')
 		self.assertIn('$gte', self.entityQuery.filters['created'])
 		self.assertIn('$lte', self.entityQuery.filters['created'])
 
-	def shouldwherewithinCalendarMonth(self):
+	def shouldwherewithINCALENDARMONTH(self):
 		self.entityQuery.reset().where('created','inCalendarMonth','0')
 		self.assertIn('$gte', self.entityQuery.filters['created'])
 		self.assertIn('$lte', self.entityQuery.filters['created'])
+
+	# def shouldwherewithEXISTS(self):
+
+	# def shouldwherewithNOTEXISTS(self):
+
 
 	# shouldmakeObjectIDS from StringIDs not tested as no coren schema
 
