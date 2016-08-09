@@ -30,6 +30,7 @@ class test(tryout.TestSuite):
 		self.assertTrue(self.db.key != None)
 		self.assertTrue('\n' not in self.db.key)
 
+	# Note: This test will not pass with auth on coren/caretaker
 	def shouldNotWorkWithoutAKey(self):
 		self.db.key = 'banana'
 		resp = self.db.find('_entity')\

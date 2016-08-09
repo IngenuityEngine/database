@@ -418,6 +418,12 @@ class Query(object):
 		end = self.time
 		return self.filter_between(field, start, end)
 
+	def filter_notInLast(self, field, valA, valB):
+		futureTime = self.getTimeVal(valA, valB)
+		difference = futureTime - self.time
+		start = self.time - difference
+		return self.filter_lessThan(field, start)
+
 	def filter_inCalenderDay(self, field, valA):
 		valA = arkUtil.ensureNumber(valA)
 		# 0 is day to day + 1
