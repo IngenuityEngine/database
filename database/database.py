@@ -60,26 +60,28 @@ class Database(object):
 	# Initial connection to database will call database.connect()
 	# Afterwards, for .execute() commands, just use health
 	def connect(self):
-		if self.schema:
-			return self
+		self.checkHealth()
+		return self
+		# if self.schema:
+		# 	return self
 
-		while True:
-			try:
-				self.schema = None
-				print 'connecting to :', self.apiRoot + '_schema'
-				response = self.get(self.apiRoot + '_schema')
-				response = response.json()
-				response = arkUtil.unicodeToString(response)
-				self.schema = response
-				self.getTime()
-				return self
-			except Exception as e:
-				print e
-				if self.keepTrying:
-					print 'No connection made yet, trying again.'
-					time.sleep(0.5)
-				else:
-					return None
+		# while True:
+		# 	try:
+		# 		self.schema = None
+		# 		print 'connecting to :', self.apiRoot + '_schema'
+		# 		response = self.get(self.apiRoot + '_schema')
+		# 		response = response.json()
+		# 		response = arkUtil.unicodeToString(response)
+		# 		self.schema = response
+		# 		self.getTime()
+		# 		return self
+		# 	except Exception as e:
+		# 		print e
+		# 		if self.keepTrying:
+		# 			print 'No connection made yet, trying again.'
+		# 			time.sleep(0.5)
+		# 		else:
+		# 			return None
 
 	def checkHealth(self):
 		while True:
