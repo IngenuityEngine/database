@@ -60,6 +60,7 @@ class Database(object):
 	# Initial connection to database will call database.connect()
 	# Afterwards, for .execute() commands, just use health
 	def connect(self):
+		print 'connecting to :', self.apiRoot
 		self.checkHealth()
 		return self
 		# if self.schema:
