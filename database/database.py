@@ -276,12 +276,12 @@ class Database(object):
 					if response:
 						response = response[0]
 					else:
-						response = []
+						response = None
 				if queryOptions['method'] == 'getID':
 					if response:
 						response = response[0]['_id']
 					else:
-						response = []
+						response = None
 			else:
 				print 'response status:', response.status_code
 				raise response.json()
