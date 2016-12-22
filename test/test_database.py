@@ -111,6 +111,25 @@ class test(tryout.TestSuite):
 		print 'found:', found
 		self.assertEqual(found[0]['_id'], og[0]['_id'])
 
+	def findNotEqual(self):
+		result = self.db\
+			.remove('test_fields')\
+			.where('text','is','testarosa')\
+			.multiple()\
+			.execute()
+		print 'removed:', result['modified']
+
+		self.db.create('test_fields', {'text': 'testarosa'}).execute()
+		keeper = self.db.create('test_fields', {'text': 'testarosa'}).execute()
+		result = self.db\
+			.remove('test_fields')\
+			.where('_id','is not',keeper[0]['_id'])\
+			.where('text', 'is', 'testarosa')\
+			.multiple()\
+			.execute()
+		print 'result:', result
+		self.assertEqual(result['modified'], 1)
+
 	# def shouldListUsers(self):
 	# 	resp = self.db.find('user').execute()
 	# 	self.assertNotEqual(len(resp), 0)
