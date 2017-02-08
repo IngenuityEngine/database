@@ -31,13 +31,13 @@ class test(tryout.TestSuite):
 		self.assertTrue('\n' not in self.db.key)
 
 	# Note: This test will not pass with auth on coren/caretaker
-	def shouldNotWorkWithoutAKey(self):
-		self.db.key = 'banana'
-		resp = self.db.find('_entity')\
-			.where('name','is','_field')\
-			.execute()
-		print 'resp:', resp
-		self.assertEqual(resp, None)
+	# def shouldNotWorkWithoutAKey(self):
+	# 	self.db.key = 'banana'
+	# 	resp = self.db.find('_entity')\
+	# 		.where('name','is','_field')\
+	# 		.execute()
+	# 	print 'resp:', resp
+	# 	self.assertEqual(resp, None)
 
 	def shouldFindEntity(self):
 		resp = self.db.find('_entity')\
@@ -129,6 +129,34 @@ class test(tryout.TestSuite):
 			.execute()
 		print 'result:', result
 		self.assertEqual(result['modified'], 1)
+
+	def removeMultiple(self):
+		data = [{'count': 12}] * 5
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+		print 'created:', result
+
+		result = self.db.remove('test_fields')\
+			.where('count','is',12)\
+			.multiple()\
+			.execute()
+		self.assertTrue(result['modified'] >= 5)
+
+	def findByID(self):
+		data = {'count': 84}
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+
+		result = self.db.findOne('test_fields')\
+			.where('_id','is',result[0]['_id'])\
+			.execute()
+
+		self.assertEqual(result['count'], 84)
+
 
 	# def shouldListUsers(self):
 	# 	resp = self.db.find('user').execute()
