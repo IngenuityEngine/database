@@ -61,15 +61,6 @@ class test(tryout.TestSuite):
 		entities = self.db.find('_entity').limit(1).execute()
 		self.assertTrue(len(entities) == 1)
 
-	# def shouldCreateEntity(self):
-	# 	resp = self.db.find('_entity').execute()
-	# 	numEntities = len(resp.json())
-	# 	self.db.create('_entity', {'name': 'newstuff'}).execute()
-	# 	resp = self.db.find('_entity').execute()
-	# 	self.assertEqual(len(resp.json()), numEntities+1)
-	# 	resp = self.db.find('_entity').where('name','is','newstuff').execute()
-	# 	self.assertEqual(len(resp.json()), 1)
-
 	def shouldListFields(self):
 		resp = self.db.find('_field').execute()
 		self.assertTrue(len(resp) > 0)
@@ -156,6 +147,31 @@ class test(tryout.TestSuite):
 			.execute()
 
 		self.assertEqual(result['count'], 84)
+
+	def removeByNameID(self):
+		result = self.db\
+			.remove('test_fields')\
+			.multiple()\
+			.execute()
+
+		data = [
+			{'name': 'tacos'},
+		]
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+
+		print 'create:', result
+
+		result = self.db.remove('sheep')\
+			.where('name','is','tacos')\
+			.where('_id','is not',result[0]['_id'])\
+			.multiple()\
+			.execute()
+
+		print result
+		self.assertEqual(result['modified'], 0)
 
 
 	# def shouldListUsers(self):
