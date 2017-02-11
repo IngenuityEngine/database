@@ -234,13 +234,17 @@ class Database(object):
 	def post(self, url, data=None):
 		return requests.post(url, json=data, cookies=self.getCookie())
 
+	# use params instead of data, many frameworks strip data from
+	# delete requests, namely http-proxy
+	# https://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
 	def delete(self, url, data=None):
-		return requests.delete(url, data=data, cookies=self.getCookie())
+		return requests.delete(url, params=data, cookies=self.getCookie())
 
 	# called on query.execute
 	def _execute(self, queryParams, queryOptions):
 		data = {'_query': json.dumps(queryParams)}
 		data['_options'] = json.dumps(queryOptions)
+		print 'data[options]:', data['_options']
 		# if ('multi' in queryOptions):
 		# 	data['_options']=json.dumps({'multi': queryOptions['multi']})
 

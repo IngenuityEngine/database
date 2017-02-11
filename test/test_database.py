@@ -164,7 +164,7 @@ class test(tryout.TestSuite):
 
 		print 'create:', result
 
-		result = self.db.remove('sheep')\
+		result = self.db.remove('test_fields')\
 			.where('name','is','tacos')\
 			.where('_id','is not',result[0]['_id'])\
 			.multiple()\
@@ -172,6 +172,25 @@ class test(tryout.TestSuite):
 
 		print result
 		self.assertEqual(result['modified'], 0)
+
+	def removeWithComplexQuery(self):
+
+		data = [{'count': 12,'number':8}] * 5
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+
+		result = self.db\
+			.remove('test_fields')\
+			.where('count','is',12)\
+			.where('number','is',8)\
+			.where('create','in last','2','days')\
+			.multiple()\
+			.execute()
+
+		print result
+		self.assertTrue(result['modified'] > 4)
 
 
 	# def shouldListUsers(self):
