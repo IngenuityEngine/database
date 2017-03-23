@@ -243,20 +243,34 @@ class test(tryout.TestSuite):
 	# 	self.db.create('fields', {'multiEntity': ['stuff', 'more stuff', 'other stuff'], 'text': ' a newly created entityType'}).execute()
 	# 	self.db.remove('fields').multiple(True).execute()
 
-	# def shouldIncrementTestField(self):
-	# 	self.db.create('fields', {'name': 'updateField', 'number': 3}).execute()
-	# 	self.db.update('fields')\
-	# 				.where('name','is','updateField')\
-	# 				.increment('number', 5)\
-	# 				.execute()
-	# 	result = self.db.findOne('fields')\
-	# 						.where('name','is','updateField')\
-	# 						.execute()
-	# 	self.db.remove('fields')\
-	# 				.where('name', 'is', 'updateField')\
-	# 				.multiple(True)\
-	# 				.execute()
-	# 	self.assertEqual(result['number'], 8)
+	def shouldIncrementTestField(self):
+		self.db.empty('test_fields')
+
+		one = self.db.create('test_fields', {'name': 'updateField', 'number': 3}).execute()
+		two = self.db.create('test_fields', {'name': 'updateField', 'number': 3}).execute()
+
+		self.db.update('test_fields')\
+					.where('_id','in',[two[0]['_id']])\
+					.increment('number', 5)\
+					.execute()
+
+		result = self.db.findOne('test_fields')\
+							.where('_id','is',two[0]['_id'])\
+							.execute()
+
+		result = self.db.findOne('test_fields')\
+							.where('_id','is',one[0]['_id'])\
+							.execute()
+
+		self.assertEqual(result['number'], 3)
+
+		result = self.db.findOne('test_fields')\
+							.where('_id','is',two[0]['_id'])\
+							.execute()
+
+		self.assertEqual(result['number'], 8)
+
+		self.db.empty('test_fields')
 
 
 
