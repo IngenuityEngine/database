@@ -31,13 +31,13 @@ class test(tryout.TestSuite):
 		self.assertTrue('\n' not in self.db.key)
 
 	# Note: This test will not pass with auth on coren/caretaker
-	def shouldNotWorkWithoutAKey(self):
-		self.db.key = 'banana'
-		resp = self.db.find('_entity')\
-			.where('name','is','_field')\
-			.execute()
-		print 'resp:', resp
-		self.assertEqual(resp, None)
+	# def shouldNotWorkWithoutAKey(self):
+	# 	self.db.key = 'banana'
+	# 	resp = self.db.find('_entity')\
+	# 		.where('name','is','_field')\
+	# 		.execute()
+	# 	print 'resp:', resp
+	# 	self.assertEqual(resp, None)
 
 	def shouldFindEntity(self):
 		resp = self.db.find('_entity')\
@@ -60,15 +60,6 @@ class test(tryout.TestSuite):
 	def should_find_with_limit(self):
 		entities = self.db.find('_entity').limit(1).execute()
 		self.assertTrue(len(entities) == 1)
-
-	# def shouldCreateEntity(self):
-	# 	resp = self.db.find('_entity').execute()
-	# 	numEntities = len(resp.json())
-	# 	self.db.create('_entity', {'name': 'newstuff'}).execute()
-	# 	resp = self.db.find('_entity').execute()
-	# 	self.assertEqual(len(resp.json()), numEntities+1)
-	# 	resp = self.db.find('_entity').where('name','is','newstuff').execute()
-	# 	self.assertEqual(len(resp.json()), 1)
 
 	def shouldListFields(self):
 		resp = self.db.find('_field').execute()
@@ -130,6 +121,78 @@ class test(tryout.TestSuite):
 		print 'result:', result
 		self.assertEqual(result['modified'], 1)
 
+	def removeMultiple(self):
+		data = [{'count': 12}] * 5
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+		print 'created:', result
+
+		result = self.db.remove('test_fields')\
+			.where('count','is',12)\
+			.multiple()\
+			.execute()
+		self.assertTrue(result['modified'] >= 5)
+
+	def findByID(self):
+		data = {'count': 84}
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+
+		result = self.db.findOne('test_fields')\
+			.where('_id','is',result[0]['_id'])\
+			.execute()
+
+		self.assertEqual(result['count'], 84)
+
+	def removeByNameID(self):
+		result = self.db\
+			.remove('test_fields')\
+			.multiple()\
+			.execute()
+
+		data = [
+			{'name': 'tacos'},
+		]
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+
+		print 'create:', result
+
+		result = self.db.remove('test_fields')\
+			.where('name','is','tacos')\
+			.where('_id','is not',result[0]['_id'])\
+			.multiple()\
+			.execute()
+
+		print result
+		self.assertEqual(result['modified'], 0)
+
+	def removeWithComplexQuery(self):
+
+		data = [{'count': 12,'number':8}] * 5
+
+		result = self.db\
+			.create('test_fields', data)\
+			.execute()
+
+		result = self.db\
+			.remove('test_fields')\
+			.where('count','is',12)\
+			.where('number','is',8)\
+			.where('create','in last','2','days')\
+			.multiple()\
+			.execute()
+
+		print result
+		self.assertTrue(result['modified'] > 4)
+
+
 	# def shouldListUsers(self):
 	# 	resp = self.db.find('user').execute()
 	# 	self.assertNotEqual(len(resp), 0)
@@ -180,20 +243,34 @@ class test(tryout.TestSuite):
 	# 	self.db.create('fields', {'multiEntity': ['stuff', 'more stuff', 'other stuff'], 'text': ' a newly created entityType'}).execute()
 	# 	self.db.remove('fields').multiple(True).execute()
 
-	# def shouldIncrementTestField(self):
-	# 	self.db.create('fields', {'name': 'updateField', 'number': 3}).execute()
-	# 	self.db.update('fields')\
-	# 				.where('name','is','updateField')\
-	# 				.increment('number', 5)\
-	# 				.execute()
-	# 	result = self.db.findOne('fields')\
-	# 						.where('name','is','updateField')\
-	# 						.execute()
-	# 	self.db.remove('fields')\
-	# 				.where('name', 'is', 'updateField')\
-	# 				.multiple(True)\
-	# 				.execute()
-	# 	self.assertEqual(result['number'], 8)
+	def shouldIncrementTestField(self):
+		self.db.empty('test_fields')
+
+		one = self.db.create('test_fields', {'name': 'updateField', 'number': 3}).execute()
+		two = self.db.create('test_fields', {'name': 'updateField', 'number': 3}).execute()
+
+		self.db.update('test_fields')\
+					.where('_id','in',[two[0]['_id']])\
+					.increment('number', 5)\
+					.execute()
+
+		result = self.db.findOne('test_fields')\
+							.where('_id','is',two[0]['_id'])\
+							.execute()
+
+		result = self.db.findOne('test_fields')\
+							.where('_id','is',one[0]['_id'])\
+							.execute()
+
+		self.assertEqual(result['number'], 3)
+
+		result = self.db.findOne('test_fields')\
+							.where('_id','is',two[0]['_id'])\
+							.execute()
+
+		self.assertEqual(result['number'], 8)
+
+		self.db.empty('test_fields')
 
 
 

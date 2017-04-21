@@ -542,9 +542,8 @@ class Query(object):
 
 		now = arrow.get(self.time)
 		relativeTimeArgs = {timeVal['unit'] : timeVal['num']}
-		next = now + relativedelta(**relativeTimeArgs)
+		next = now - relativedelta(**relativeTimeArgs)
 
-		print 'next:', next
 		return (arrow.get(next).timestamp)
 
 	# Helpers
