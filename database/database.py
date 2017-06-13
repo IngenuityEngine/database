@@ -34,7 +34,7 @@ class Database(object):
 			apiRoot = globalSettings.DATABASE
 
 		self.key = None
-		keyFile = os.environ.get('ARK_CONFIG') + 'key.user.dat'
+		keyFile = os.environ.get('USER_CONFIG') + 'key.user.dat'
 		try:
 			with open(keyFile) as f:
 				self.key = f.readlines()[0].strip()
