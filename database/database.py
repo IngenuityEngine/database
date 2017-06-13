@@ -44,7 +44,7 @@ class Database(object):
 
 		if not self.key:
 			print 'Using default database key'
-			keyFile = os.environ.get('ARK_CONFIG') + 'key.dat'
+			keyFile = os.environ.get('ARK_ROOT') + '/ark/config/key.dat'
 			try:
 				with open(keyFile) as f:
 					self.key = f.readlines()[0].strip()
