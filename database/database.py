@@ -296,7 +296,7 @@ class Database(object):
 def main():
 	while True:
 		print 'db connect'
-		database = Database('http://127.0.0.1/api', keepTrying=True)
+		database = Database('http://127.0.0.1/api', keepTrying=False)
 		database.connect()
 		print 'exec find'
 		print database.find('version').limit(1).execute()
