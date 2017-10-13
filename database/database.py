@@ -22,6 +22,7 @@ class Database(object):
 
 	timeRefresh = 60
 	lastTimeCheck = 0
+	timeout = 20
 
 	validApiOptions = [
 		'getLinks',
@@ -226,19 +227,19 @@ class Database(object):
 
 	# wrap request methods w/ getCookie and normalize data name
 	def get(self, url, params=None):
-		return requests.get(url, params=params, cookies=self.getCookie())
+		return requests.get(url, params=params, cookies=self.getCookie(), timeout=self.timeout)
 
 	def put(self, url, data=None):
-		return requests.put(url, json=data, cookies=self.getCookie())
+		return requests.put(url, json=data, cookies=self.getCookie(), timeout=self.timeout)
 
 	def post(self, url, data=None):
-		return requests.post(url, json=data, cookies=self.getCookie())
+		return requests.post(url, json=data, cookies=self.getCookie(), timeout=self.timeout)
 
 	# send data as params instead of data, many frameworks strip data from
 	# delete requests, namely http-proxy :(
 	# https://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
 	def delete(self, url, data=None):
-		return requests.delete(url, params=data, cookies=self.getCookie())
+		return requests.delete(url, params=data, cookies=self.getCookie(), timeout=self.timeout)
 
 	# called on query.execute
 	def _execute(self, queryParams, queryOptions):
